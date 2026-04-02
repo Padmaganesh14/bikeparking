@@ -4,7 +4,7 @@ function AdminDashboard() {
   const [vehicles, setVehicles] = useState([]);
 
   useEffect(() => {
-    fetch("https://bikeparking.kesug.com/api/vehicles.php")
+    fetch("https://bikeparking.kesug.com/api/vehicles.php?i=1")
       .then(res => res.json())
       .then(data => setVehicles(data))
       .catch(err => console.error(err));
