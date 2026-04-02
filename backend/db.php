@@ -1,4 +1,7 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
@@ -17,7 +20,6 @@ $database = 'if0_41542624_bike_parking';
 $conn = new mysqli($host, $username, $password, $database);
 
 if ($conn->connect_error) {
-    echo json_encode(["error" => "Connection failed"]);
-    exit();
+    die("DB ERROR: " . $conn->connect_error);
 }
 ?>
