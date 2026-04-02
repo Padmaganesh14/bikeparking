@@ -1,7 +1,4 @@
-CREATE DATABASE IF NOT EXISTS bike_parking;
-USE bike_parking;
-
-CREATE TABLE IF NOT EXISTS parking (
+ CREATE TABLE IF NOT EXISTS parking (
     id INT AUTO_INCREMENT PRIMARY KEY,
     vehicle_no VARCHAR(50) NOT NULL,
     entry_time DATETIME NOT NULL,
