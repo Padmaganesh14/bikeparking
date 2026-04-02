@@ -1,85 +1,42 @@
-import React, { useState } from 'react';
-import { exitVehicle } from '../services/api';
+ import { useState } from "react";
 
-const ExitPage = () => {
-  const [vehicleNo, setVehicleNo] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
-  const [receipt, setReceipt] = useState(null);
+function ExitPage() {
+  const [vehicleNo, setVehicleNo] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!vehicleNo.trim()) {
-      setError('Please enter a vehicle number');
-      return;
-    }
-    
-    setLoading(true);
-    setSuccess('');
-    setError('');
-    setReceipt(null);
-    
-    try {
-      const res = await exitVehicle(vehicleNo);
-      if (res.success) {
-        setSuccess(res.message);
-        setReceipt({
-          fee: res.fee,
-          hours: res.duration_hours,
-          entryTime: res.entry_time,
-          exitTime: res.exit_time
-        });
-        setVehicleNo('');
-      } else {
-        setError(res.message);
-      }
-    } catch (err) {
-      setError('Failed to connect to server. Is PHP running on port 8000?');
-    } finally {
-      setLoading(false);
-    }
+  const handleExit = () => {
+    fetch("https://bikeparking.kesug.com/api/exit.php?i=1", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ vehicle_no: vehicleNo })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert(`Fee: ₹${data.fee}`);
+        } else {
+          alert(data.message);
+        }
+        setVehicleNo("");
+      })
+      .catch(err => console.error(err));
   };
 
   return (
-    <div className="card">
-      <h2 className="card-title">Vehicle Exit</h2>
-      
-      {success && <div className="alert alert-success">{success}</div>}
-      {error && <div className="alert alert-error">{error}</div>}
-      
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="vehicleNo">Vehicle Number</label>
-          <input
-            type="text"
-            id="vehicleNo"
-            className="form-control uppercase"
-            value={vehicleNo}
-            onChange={(e) => setVehicleNo(e.target.value.toUpperCase())}
-            placeholder="e.g. MH12AB1234"
-            disabled={loading}
-            required
-          />
-        </div>
-        <button type="submit" className="btn" disabled={loading}>
-          {loading ? 'Processing...' : 'Process Exit & Calculate Fee'}
-        </button>
-      </form>
+    <div>
+      <h1>Vehicle Exit</h1>
 
-      {receipt && (
-        <div className="receipt-box">
-          <h3>Payment Receipt</h3>
-          <p>Duration: {receipt.hours} hour(s)</p>
-          <div className="fee-display">₹{receipt.fee}</div>
-          <p style={{fontSize: '0.875rem', color: 'var(--text-muted)'}}>
-            Entry: {new Date(receipt.entryTime).toLocaleString()}<br/>
-            Exit: {new Date(receipt.exitTime).toLocaleString()}
-          </p>
-        </div>
-      )}
+      <input
+        type="text"
+        placeholder="Enter Vehicle Number"
+        value={vehicleNo}
+        onChange={e => setVehicleNo(e.target.value)}
+      />
+
+      <button onClick={handleExit}>Exit Vehicle</button>
     </div>
   );
-};
+}
 
 export default ExitPage;
