@@ -1,106 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { getAllVehicles } from '../services/api';
+ import { useEffect, useState } from "react";
 
-const AdminDashboard = () => {
+function AdminDashboard() {
   const [vehicles, setVehicles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  
-  // Filters
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
 
-  useEffect(() => {
-    fetchVehicles();
-  }, []);
-
-  const fetchVehicles = async () => {
-    try {
-      setLoading(true);
-      const res = await getAllVehicles();
-      if (res.success) {
-        setVehicles(res.data);
-      } else {
-        setError(res.message || 'Failed to fetch data');
-      }
-    } catch (err) {
-      setError('Failed to connect to server. Is PHP running on port 8000?');
-    } finally {
-      setLoading(false);
-    }
+  const fetchData = () => {
+    fetch("https://bikeparking.kesug.com/api/vehicles.php?i=1")
+      .then(res => res.json())
+      .then(res => setVehicles(res.data))
+      .catch(err => console.error(err));
   };
 
-  const filteredVehicles = vehicles.filter(v => {
-    const matchesSearch = v.vehicle_no.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || v.status === filterStatus;
-    return matchesSearch && matchesStatus;
-  });
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
-    <div className="card dashboard-card">
-      <h2 className="card-title">Admin Dashboard</h2>
-      
-      {error && <div className="alert alert-error">{error}</div>}
-      
-      <div className="dashboard-controls">
-        <input 
-          type="text" 
-          placeholder="Search Vehicle No..." 
-          className="form-control search-input uppercase"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <select 
-          className="filter-select"
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-        >
-          <option value="all">All Status</option>
-          <option value="parked">Parked</option>
-          <option value="paid">Paid</option>
-        </select>
-      </div>
+    <div>
+      <h1>Admin Dashboard</h1>
 
-      <div className="table-responsive">
-        {loading ? (
-          <p style={{textAlign: 'center', padding: '2rem'}}>Loading data...</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Vehicle No</th>
-                <th>Entry Time</th>
-                <th>Exit Time</th>
-                <th>Fee</th>
-                <th>Status</th>
+      <button onClick={fetchData}>Refresh</button>
+
+      {vehicles.length === 0 ? (
+        <p>No data available</p>
+      ) : (
+        <table border="1" cellPadding="10">
+          <thead>
+            <tr>
+              <th>Vehicle No</th>
+              <th>Status</th>
+              <th>Entry Time</th>
+              <th>Exit Time</th>
+              <th>Fee</th>
+            </tr>
+          </thead>
+          <tbody>
+            {vehicles.map((v, index) => (
+              <tr key={index}>
+                <td>{v.vehicle_no}</td>
+                <td>{v.status}</td>
+                <td>{v.entry_time}</td>
+                <td>{v.exit_time || "—"}</td>
+                <td>{v.fee || "—"}</td>
               </tr>
-            </thead>
-            <tbody>
-              {filteredVehicles.length > 0 ? (
-                filteredVehicles.map((v) => (
-                  <tr key={v.id}>
-                    <td style={{fontWeight: 600}}>{v.vehicle_no}</td>
-                    <td>{new Date(v.entry_time).toLocaleString()}</td>
-                    <td>{v.exit_time ? new Date(v.exit_time).toLocaleString() : '-'}</td>
-                    <td>{v.fee !== null ? `₹${v.fee}` : '-'}</td>
-                    <td>
-                      <span className={`status-badge status-${v.status}`}>
-                        {v.status.toUpperCase()}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" style={{textAlign: 'center', padding: '2rem'}}>No vehicles found.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        )}
-      </div>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
-};
+}
 
 export default AdminDashboard;
