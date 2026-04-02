@@ -1,26 +1,45 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import EntryPage from './pages/EntryPage';
-import ExitPage from './pages/ExitPage';
-import AdminDashboard from './pages/AdminDashboard';
-import AdBanner from './components/AdBanner';
+import { useEffect, useState } from "react";
 
-function App() {
+function AdminDashboard() {
+  const [vehicles, setVehicles] = useState([]);
+
+  useEffect(() => {
+    fetch("https://bikeparking.kesug.com/api/vehicles.php")
+      .then(res => res.json())
+      .then(data => setVehicles(data))
+      .catch(err => console.error(err));
+  }, []);
+
   return (
-    <Router>
-      <div className="app-container">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<EntryPage />} />
-          <Route path="/exit" element={<ExitPage />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-        </Routes>
-        {/* AdSense Ad — visible with proper dimensions */}
-        <AdBanner adSlot="YOUR_SLOT_ID" adFormat="auto" />
-      </div>
-    </Router>
+    <div>
+      <h1>Admin Dashboard</h1>
+
+      {vehicles.length === 0 ? (
+        <p>No data available</p>
+      ) : (
+        <table border="1" cellPadding="10">
+          <thead>
+            <tr>
+              <th>Vehicle No</th>
+              <th>Status</th>
+              <th>Entry Time</th>
+              <th>Exit Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {vehicles.map((v, index) => (
+              <tr key={index}>
+                <td>{v.vehicle_no}</td>
+                <td>{v.status}</td>
+                <td>{v.entry_time}</td>
+                <td>{v.exit_time || "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
   );
 }
 
-export default App;
+export default AdminDashboard;
