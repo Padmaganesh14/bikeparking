@@ -1,10 +1,10 @@
- import { useState } from "react";
+import { useState } from "react";
 
 function EntryPage() {
   const [vehicleNo, setVehicleNo] = useState("");
 
   const handleEntry = () => {
-    fetch("https://bikeparking.kesug.com/api/entry.php?i=1", {
+    fetch("https://bikeparking.kesug.com/backend/entry.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
