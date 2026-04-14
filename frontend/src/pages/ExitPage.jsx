@@ -1,10 +1,10 @@
- import { useState } from "react";
+import { useState } from "react";
 
 function ExitPage() {
   const [vehicleNo, setVehicleNo] = useState("");
 
   const handleExit = () => {
-    fetch("https://bikeparking.kesug.com/api/exit.php?i=1", {
+    fetch("https://bikeparking.kesug.com/backend/exit.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
