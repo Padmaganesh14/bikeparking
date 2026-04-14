@@ -1,12 +1,18 @@
- import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 function AdminDashboard() {
   const [vehicles, setVehicles] = useState([]);
 
   const fetchData = () => {
-    fetch("https://bikeparking.kesug.com/api/vehicles.php?i=1")
+    fetch("https://bikeparking.kesug.com/backend/vehicles.php")
       .then(res => res.json())
-      .then(res => setVehicles(res.data))
+      .then(res => {
+        if (res.success) {
+          setVehicles(res.data);
+        } else {
+          console.error(res.message);
+        }
+      })
       .catch(err => console.error(err));
   };
 
@@ -34,8 +40,8 @@ function AdminDashboard() {
             </tr>
           </thead>
           <tbody>
-            {vehicles.map((v, index) => (
-              <tr key={index}>
+            {vehicles.map((v) => (
+              <tr key={v.id}>
                 <td>{v.vehicle_no}</td>
                 <td>{v.status}</td>
                 <td>{v.entry_time}</td>
